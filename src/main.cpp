@@ -98,22 +98,20 @@ class $modify(MyPlayLayer, PlayLayer) {
         // 22-37%: hold
         // TODO: cfg
         if (progress >= 22.0f && progress < 37.0f) {
-                // addChatMessage(chat("hold"));
-                // addChatMessage(chat("HOLD"));
-                // addChatMessage(chat("hooold"));
+            // addChatMessage(chat("hold"));
+            // addChatMessage(chat("HOLD"));
+            // addChatMessage(chat("hooold"));
             
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
-                if (rand() % 3 == 0) {
-                    std::vector<std::string> messages = {
-                        chat("holdlldldldl"),
-                        chat("HOLD IT"),
-                        chat("HOOOOOOOOLDDDDDDDDDDDD"),
-                        chat("HOOOLD"),
-                        chat("HOLDDDDDDDDDDDDDDDDDDD")
-                    };
-                    addChatMessage(messages[rand() % messages.size()]);
-                }
+                std::vector<std::string> messages = {
+                    chat("holdlldldldl"),
+                    chat("HOLD IT"),
+                    chat("HOOOOOOOOLDDDDDDDDDDDD"),
+                    chat("HOOOLD"),
+                    chat("HOLDDDDDDDDDDDDDDDDDDD")
+                };
+                addChatMessage(messages[rand() % messages.size()]);
                 m_fields->m_randomChatTimer = 0;
                 m_fields->m_nextChatDelay = 0.1f + (rand() % 10) / 10.0f;
             }
@@ -121,49 +119,57 @@ class $modify(MyPlayLayer, PlayLayer) {
         // 37-80%: gooo
         // TODO: cfg
         else if (progress >= 37.0f && progress < 80.0f) {
-                // addChatMessage(chat("GOOOOOOO"));
-                // addChatMessage(chat("LETS GOOOO"));
-                // addChatMessage(chat("GOOOOOOOO"));
-                m_fields->m_randomChatTimer = 0;
-            
+            // addChatMessage(chat("GOOOOOOO"));
+            // addChatMessage(chat("LETS GOOOO"));
+            // addChatMessage(chat("GOOOOOOOO"));            
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
-                if (rand() % 3 == 0) {
-                    std::vector<std::string> messages = {
-                        chat("GOOOO"),
-                        chat("LETS GOOOOO"),
-                        chat("CMON"),
-                        chat("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"),
-                    };
-                    addChatMessage(messages[rand() % messages.size()]);
-                }
+                std::vector<std::string> messages = {
+                    chat("GOOOO"),
+                    chat("LETS GOOOOO"),
+                    chat("CMON"),
+                    chat("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"),
+                };
+                addChatMessage(messages[rand() % messages.size()]);
                 m_fields->m_randomChatTimer = 0;
-                m_fields->m_nextChatDelay = 0.1f + (rand() % 10) / 10.0f;
+                m_fields->m_nextChatDelay = 0.1f + (rand() % 6) / 10.0f;
             }
         }
         // 80-100%: super go and i was here
         // TODO: cfg
-        else if (progress >= 80.0f) {
-                // addChatMessage(chat("SUPER GO!!!"));
-                // addChatMessage(chat("I WAS HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"));
-                // addChatMessage(chat("SUPERGOOOOOOOOOOOOOOOOOOO"));
-                // addChatMessage(chat("I WAS HERE!!!!!!!!!!!!!!!!!!!!!!!"));
-                m_fields->m_randomChatTimer = 0;
-            
+        else if (progress >= 80.0f && progress < 99.9f) {
+            // addChatMessage(chat("SUPER GO!!!"));
+            // addChatMessage(chat("I WAS HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"));
+            // addChatMessage(chat("SUPERGOOOOOOOOOOOOOOOOOOO"));
+            // addChatMessage(chat("I WAS HERE!!!!!!!!!!!!!!!!!!!!!!!"));            
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
-                if (rand() % 3 == 0) {
-                    std::vector<std::string> messages = {
-                        chat("SUPER GOOOOOOOOOOOOOOOOOOOOOO"),
-                        chat("SUPERGOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!!!!!!"),
-                        chat("I WAS HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"),
-                        chat("CMONNNN"),
-                        chat("GOOOOO GOOOOOO GOOOOOOOO")
-                    };
-                    addChatMessage(messages[rand() % messages.size()]);
-                }
+                std::vector<std::string> messages = {
+                    chat("SUPER GOOOOOOOOOOOOOOOOOOOOOO"),
+                    chat("SUPERGOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!!!!!!"),
+                    chat("I WAS HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"),
+                    chat("CMONNNN"),
+                    chat("GOOOOO GOOOOOO GOOOOOOOO")
+                };
+                addChatMessage(messages[rand() % messages.size()]);
                 m_fields->m_randomChatTimer = 0;
-                m_fields->m_nextChatDelay = 0.1f + (rand() % 10) / 10.0f;
+                m_fields->m_nextChatDelay = 0.1f + (rand() % 4) / 10.0f;
+            }
+        } 
+        // 100%: gg
+        else if (progress > 99.9f) {
+            m_fields->m_randomChatTimer += dt;
+            if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
+                std::vector<std::string> messages = {
+                    chat("GG"),
+                    chat("GGS"),
+                    chat("WWWWWWWWWWWWWWWWWWWWWWWW"),
+                    chat("LETS GOOOOO"),
+                    chat("WOOOOOOOOOOOOO")
+                };
+                addChatMessage(messages[rand() % messages.size()]);
+                m_fields->m_randomChatTimer = 0;
+                m_fields->m_nextChatDelay = 0.1f + (rand() % 3) / 10.0f;
             }
         }
     }
