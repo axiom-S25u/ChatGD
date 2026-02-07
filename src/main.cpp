@@ -1,5 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/PauseLayer.hpp>
 
 using namespace geode::prelude;
 
@@ -58,7 +59,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         m_fields->m_chatText->setZOrder(101);
         this->addChild(m_fields->m_chatText);
         
-        log::info("ChatGD: Init complete!");
+        log::info("ChatGD: Init complete");
         
         this->schedule(schedule_selector(MyPlayLayer::checkProgress));
         
@@ -198,5 +199,71 @@ class $modify(MyPlayLayer, PlayLayer) {
         m_fields->m_randomChatTimer = 0;
         m_fields->m_isDeathSpamming = false;
         m_fields->m_deathChatTimer = 0;
+    }
+};
+
+class $modify(MyPauseLayer, PauseLayer) {
+    void customSetup() {
+        PauseLayer::customSetup();
+        
+        log::info("PauseLayer customSetup called");
+        
+        // find opt menu (slightly fried way)
+        CCNode* optionsButton = nullptr;
+        CCMenu* parentMenu = nullptr;
+        
+        auto children = this->getChildren();
+        if (children) {
+            for (int i = 0; i < children->count(); i++) {
+                auto child = static_cast<CCNode*>(children->objectAtIndex(i));
+                if (!child) continue;
+                
+                if (auto menu = typeinfo_cast<CCMenu*>(child)) {
+                    auto menuChildren = menu->getChildren();
+                    if (!menuChildren) continue;
+                    
+                    for (int j = 0; j < menuChildren->count(); j++) {
+                        auto menuChild = static_cast<CCNode*>(menuChildren->objectAtIndex(j));
+                        if (!menuChild) continue;
+                        
+                        if (menuChild->getID() == "options-button") {
+                            optionsButton = menuChild;
+                            parentMenu = menu;
+                            break;
+                        }
+                    }
+                }
+                if (optionsButton) break;
+            }
+        }
+        
+        if (optionsButton && parentMenu) {
+            // make btn
+            auto myButtonSprite = CCSprite::createWithSpriteFrameName("GJ_likeBtn_001.png");
+            auto myButton = CCMenuItemSpriteExtra::create(
+                myButtonSprite,
+                this,
+                menu_selector(MyPauseLayer::onMyButton)
+            );
+            
+            // put below options
+            auto optionsPos = optionsButton->getPosition();
+            myButton->setPosition(optionsPos.x, optionsPos.y - 100);
+            parentMenu->addChild(myButton);
+        } else {
+            log::error("Options button not found!");
+        }
+    }
+    
+    void onMyButton(CCObject*) {
+        auto playLayer = PlayLayer::get();
+        if (playLayer && playLayer->m_level) {
+            int levelID = playLayer->m_level->m_levelID;
+            FLAlertLayer::create(
+                "Level Info",
+                fmt::format("Level ID: {}", levelID),
+                "OK"
+            )->show();
+        }
     }
 };
