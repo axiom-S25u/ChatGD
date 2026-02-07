@@ -182,7 +182,7 @@ class $modify(MyPlayLayer, PlayLayer) {
             if (c == '\n') lineCount++;
         }
         
-        if (lineCount >= 10) {
+        if (lineCount >= 19) {
             size_t pos = currentText.find('\n');
             if (pos != std::string::npos) {
                 currentText = currentText.substr(pos + 1);
