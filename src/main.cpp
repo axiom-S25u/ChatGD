@@ -31,6 +31,9 @@ class $modify(MyPlayLayer, PlayLayer) {
         float m_nextChatDelay = 0.5f;
         float m_deathChatTimer = 0.0f;
         bool m_isDeathSpamming = false;
+        float holdPercent = 22;
+        float goPercent = 37;
+        float superGoPercent = 80;
     };
     
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
@@ -94,9 +97,9 @@ class $modify(MyPlayLayer, PlayLayer) {
             return;
         }
         
-        // 22-37%: hold
-        // TODO: cfg
-        if (progress >= 22.0f && progress < 37.0f) {
+        // hold
+        // TODO: cfg 50% done
+        if (progress >= m_fields->holdPercent && progress < m_fields->goPercent) {
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
@@ -111,9 +114,9 @@ class $modify(MyPlayLayer, PlayLayer) {
                 m_fields->m_nextChatDelay = 0.1f + (rand() % 10) / 10.0f;
             }
         }
-        // 37-80%: gooo
-        // TODO: cfg
-        else if (progress >= 37.0f && progress < 80.0f) {           
+        // gooo
+        // TODO: cfg 50% done
+        else if (progress >= m_fields->goPercent && progress < m_fields->superGoPercent) {           
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
@@ -127,9 +130,9 @@ class $modify(MyPlayLayer, PlayLayer) {
                 m_fields->m_nextChatDelay = 0.1f + (rand() % 6) / 10.0f;
             }
         }
-        // 80-100%: super go and i was here
-        // TODO: cfg
-        else if (progress >= 80.0f && progress < 99.9f) {          
+        // super go and i was here
+        // TODO: cfg 50% done
+        else if (progress >= m_fields->superGoPercent && progress < 99.9999f) {          
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
@@ -145,7 +148,7 @@ class $modify(MyPlayLayer, PlayLayer) {
             }
         } 
         // 100%: gg
-        else if (progress > 99.9f) {
+        else if (progress > 99.9999f) {
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
