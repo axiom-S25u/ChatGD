@@ -55,7 +55,6 @@ class $modify(MyPlayLayer, PlayLayer) {
         m_fields->m_chatText->setZOrder(101);
         this->addChild(m_fields->m_chatText);
         
-        // addChatMessage("Chat loaded!");
         log::info("ChatGD: Init complete!");
         
         this->schedule(schedule_selector(MyPlayLayer::checkProgress));
@@ -98,10 +97,6 @@ class $modify(MyPlayLayer, PlayLayer) {
         // 22-37%: hold
         // TODO: cfg
         if (progress >= 22.0f && progress < 37.0f) {
-            // addChatMessage(chat("hold"));
-            // addChatMessage(chat("HOLD"));
-            // addChatMessage(chat("hooold"));
-            
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
@@ -118,10 +113,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         }
         // 37-80%: gooo
         // TODO: cfg
-        else if (progress >= 37.0f && progress < 80.0f) {
-            // addChatMessage(chat("GOOOOOOO"));
-            // addChatMessage(chat("LETS GOOOO"));
-            // addChatMessage(chat("GOOOOOOOO"));            
+        else if (progress >= 37.0f && progress < 80.0f) {           
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
@@ -137,11 +129,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         }
         // 80-100%: super go and i was here
         // TODO: cfg
-        else if (progress >= 80.0f && progress < 99.9f) {
-            // addChatMessage(chat("SUPER GO!!!"));
-            // addChatMessage(chat("I WAS HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"));
-            // addChatMessage(chat("SUPERGOOOOOOOOOOOOOOOOOOO"));
-            // addChatMessage(chat("I WAS HERE!!!!!!!!!!!!!!!!!!!!!!!"));            
+        else if (progress >= 80.0f && progress < 99.9f) {          
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
