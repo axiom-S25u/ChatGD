@@ -1,6 +1,9 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
 #include <Geode/modify/PauseLayer.hpp>
+#include <Geode/ui/Popup.hpp>
+#include <Geode/ui/TextInput.hpp>
+
 
 using namespace geode::prelude;
 
@@ -202,6 +205,56 @@ class $modify(MyPlayLayer, PlayLayer) {
     }
 };
 
+class ChatConfigPopup : public geode::Popup {
+protected:
+    geode::TextInput* m_textInput1 = nullptr;
+    geode::TextInput* m_textInput2 = nullptr;
+    geode::TextInput* m_textInput3 = nullptr;
+    
+    bool init(float width, float height) {
+        if (!Popup::init(width, height))
+            return false;
+        
+        this->setTitle("ChatGD Config");
+        auto center = m_mainLayer->getContentSize() / 2;
+        
+        // box 1
+        m_textInput1 = geode::TextInput::create(200.0f, "Hold %...");
+        m_textInput1->setPosition({center.width, center.height + 40});
+        m_textInput1->setFilter("0123456789");
+        m_textInput1->setMaxCharCount(3);
+        m_mainLayer->addChild(m_textInput1);
+        
+        // box 2
+        m_textInput2 = geode::TextInput::create(200.0f, "Go %...");
+        m_textInput2->setPosition({center.width, center.height});
+        m_textInput2->setFilter("0123456789");
+        m_textInput2->setMaxCharCount(3);
+        m_mainLayer->addChild(m_textInput2);
+        
+        // box 3
+        m_textInput3 = geode::TextInput::create(200.0f, "Super Go %...");
+        m_textInput3->setPosition({center.width, center.height - 40});
+        m_textInput3->setFilter("0123456789");
+        m_textInput3->setMaxCharCount(3);
+        m_mainLayer->addChild(m_textInput3);
+
+
+        return true;
+    }
+    
+public:
+    static ChatConfigPopup* create() {
+        auto ret = new ChatConfigPopup();
+        if (ret->init(300.0f, 200.0f)) {
+            ret->autorelease();
+            return ret;
+        }
+        delete ret;
+        return nullptr;
+    }
+};
+
 class $modify(MyPauseLayer, PauseLayer) {
     void customSetup() {
         PauseLayer::customSetup();
@@ -256,14 +309,6 @@ class $modify(MyPauseLayer, PauseLayer) {
     }
     
     void onMyButton(CCObject*) {
-        auto playLayer = PlayLayer::get();
-        if (playLayer && playLayer->m_level) {
-            int levelID = playLayer->m_level->m_levelID;
-            FLAlertLayer::create(
-                "Level Info",
-                fmt::format("Level ID: {}", levelID),
-                "OK"
-            )->show();
-        }
+        ChatConfigPopup::create()->show();
     }
 };
