@@ -253,6 +253,30 @@ public:
         delete ret;
         return nullptr;
     }
+
+    void onClose(CCObject* sender) override {
+        // get playlayer
+        auto playLayer = PlayLayer::get();
+        //get id
+        int levelID = playLayer->m_level->m_levelID;
+        // get vals
+        std::string holdStr = m_textInput1->getString();
+        std::string goStr = m_textInput2->getString();
+        std::string superGoStr = m_textInput3->getString();
+        
+        // conv to int
+        auto hold = geode::utils::numFromString<int>(holdStr);
+        auto go = geode::utils::numFromString<int>(goStr);
+        auto superGo = geode::utils::numFromString<int>(superGoStr);
+        
+        if (hold && go && superGo) {
+            Mod::get()->setSavedValue(std::to_string(levelID)+"hold-percent", *hold);
+            Mod::get()->setSavedValue(std::to_string(levelID)+"go-percent", *go);
+            Mod::get()->setSavedValue(std::to_string(levelID)+"supergo-percent", *superGo);
+        }
+        
+        geode::Popup::onClose(sender);
+    }
 };
 
 class $modify(MyPauseLayer, PauseLayer) {
