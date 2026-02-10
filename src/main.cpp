@@ -45,11 +45,9 @@ class $modify(MyPlayLayer, PlayLayer) {
             return false;
         }
         
-            log::info("Loaded: Hold percent: {}", Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"hold-percent", 22.0f));
-            log::info("Loaded: Go percent: {}", Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"go-percent", 37.0f));
-            log::info("Loaded: Super go percent: {}", Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"supergo-percent", 80.0f));
-        
-
+        m_fields->holdPercent = Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"hold-percent", 22.0f);
+        m_fields->goPercent = Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"go-percent", 37.0f);
+        m_fields->superGoPercent = Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"supergo-percent", 80.0f);
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
         
