@@ -45,6 +45,14 @@ class $modify(MyPlayLayer, PlayLayer) {
             return false;
         }
         
+        // if (condition) {
+            log::info("Loaded: Hold percent: {}", Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"hold-percent"));
+            log::info("Loaded: Go percent: {}", Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"go-percent"));
+            log::info("Loaded: Super go percent: {}", Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"supergo-percent"));
+        // }
+        
+
+
         auto winSize = CCDirector::sharedDirector()->getWinSize();
         
         // chat box
