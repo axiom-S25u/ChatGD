@@ -1,5 +1,9 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/PauseLayer.hpp>
+#include <Geode/ui/Popup.hpp>
+#include <Geode/ui/TextInput.hpp>
+
 
 using namespace geode::prelude;
 
@@ -31,6 +35,9 @@ class $modify(MyPlayLayer, PlayLayer) {
         float m_nextChatDelay = 0.5f;
         float m_deathChatTimer = 0.0f;
         bool m_isDeathSpamming = false;
+        float holdPercent = 22;
+        float goPercent = 37;
+        float superGoPercent = 80;
     };
     
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
@@ -38,6 +45,10 @@ class $modify(MyPlayLayer, PlayLayer) {
             return false;
         }
         
+        m_fields->holdPercent = Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"hold-percent", 22.0f);
+        m_fields->goPercent = Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"go-percent", 37.0f);
+        m_fields->superGoPercent = Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"supergo-percent", 80.0f);
+
         auto winSize = CCDirector::sharedDirector()->getWinSize();
         
         // chat box
@@ -55,8 +66,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         m_fields->m_chatText->setZOrder(101);
         this->addChild(m_fields->m_chatText);
         
-        // addChatMessage("Chat loaded!");
-        log::info("ChatGD: Init complete!");
+        log::info("ChatGD: Init complete");
         
         this->schedule(schedule_selector(MyPlayLayer::checkProgress));
         
@@ -95,75 +105,70 @@ class $modify(MyPlayLayer, PlayLayer) {
             return;
         }
         
-        // 22-37%: hold
-        // TODO: cfg
-        if (progress >= 22.0f && progress < 37.0f) {
-                // addChatMessage(chat("hold"));
-                // addChatMessage(chat("HOLD"));
-                // addChatMessage(chat("hooold"));
-            
+        // hold
+        // TODO: cfg 50% done
+        if (progress >= m_fields->holdPercent && progress < m_fields->goPercent) {
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
-                if (rand() % 3 == 0) {
-                    std::vector<std::string> messages = {
-                        chat("holdlldldldl"),
-                        chat("HOLD IT"),
-                        chat("HOOOOOOOOLDDDDDDDDDDDD"),
-                        chat("HOOOLD"),
-                        chat("HOLDDDDDDDDDDDDDDDDDDD")
-                    };
-                    addChatMessage(messages[rand() % messages.size()]);
-                }
+                std::vector<std::string> messages = {
+                    chat("holdlldldldl"),
+                    chat("HOLD IT"),
+                    chat("HOOOOOOOOLDDDDDDDDDDDD"),
+                    chat("HOOOLD"),
+                    chat("HOLDDDDDDDDDDDDDDDDDDD")
+                };
+                addChatMessage(messages[rand() % messages.size()]);
                 m_fields->m_randomChatTimer = 0;
                 m_fields->m_nextChatDelay = 0.1f + (rand() % 10) / 10.0f;
             }
         }
-        // 37-80%: gooo
-        // TODO: cfg
-        else if (progress >= 37.0f && progress < 80.0f) {
-                // addChatMessage(chat("GOOOOOOO"));
-                // addChatMessage(chat("LETS GOOOO"));
-                // addChatMessage(chat("GOOOOOOOO"));
-                m_fields->m_randomChatTimer = 0;
-            
+        // gooo
+        // TODO: cfg 50% done
+        else if (progress >= m_fields->goPercent && progress < m_fields->superGoPercent) {           
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
-                if (rand() % 3 == 0) {
-                    std::vector<std::string> messages = {
-                        chat("GOOOO"),
-                        chat("LETS GOOOOO"),
-                        chat("CMON"),
-                        chat("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"),
-                    };
-                    addChatMessage(messages[rand() % messages.size()]);
-                }
+                std::vector<std::string> messages = {
+                    chat("GOOOO"),
+                    chat("LETS GOOOOO"),
+                    chat("CMON"),
+                    chat("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"),
+                };
+                addChatMessage(messages[rand() % messages.size()]);
                 m_fields->m_randomChatTimer = 0;
-                m_fields->m_nextChatDelay = 0.1f + (rand() % 10) / 10.0f;
+                m_fields->m_nextChatDelay = 0.1f + (rand() % 6) / 10.0f;
             }
         }
-        // 80-100%: super go and i was here
-        // TODO: cfg
-        else if (progress >= 80.0f) {
-                // addChatMessage(chat("SUPER GO!!!"));
-                // addChatMessage(chat("I WAS HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"));
-                // addChatMessage(chat("SUPERGOOOOOOOOOOOOOOOOOOO"));
-                // addChatMessage(chat("I WAS HERE!!!!!!!!!!!!!!!!!!!!!!!"));
-                m_fields->m_randomChatTimer = 0;
-            
+        // super go and i was here
+        // TODO: cfg 50% done
+        else if (progress >= m_fields->superGoPercent && progress < 99.9999f) {          
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
-                if (rand() % 3 == 0) {
-                    std::vector<std::string> messages = {
-                        chat("SUPER GOOOOOOOOOOOOOOOOOOOOOO"),
-                        chat("SUPERGOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!!!!!!"),
-                        chat("I WAS HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"),
-                        chat("CMONNNN"),
-                        chat("GOOOOO GOOOOOO GOOOOOOOO")
-                    };
-                    addChatMessage(messages[rand() % messages.size()]);
-                }
+                std::vector<std::string> messages = {
+                    chat("SUPER GOOOOOOOOOOOOOOOOOOOOOO"),
+                    chat("SUPERGOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!!!!!!"),
+                    chat("I WAS HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"),
+                    chat("CMONNNN"),
+                    chat("GOOOOO GOOOOOO GOOOOOOOO")
+                };
+                addChatMessage(messages[rand() % messages.size()]);
                 m_fields->m_randomChatTimer = 0;
-                m_fields->m_nextChatDelay = 0.1f + (rand() % 10) / 10.0f;
+                m_fields->m_nextChatDelay = 0.1f + (rand() % 4) / 10.0f;
+            }
+        } 
+        // 100%: gg
+        else if (progress > 99.9999f) {
+            m_fields->m_randomChatTimer += dt;
+            if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
+                std::vector<std::string> messages = {
+                    chat("GG"),
+                    chat("GGS"),
+                    chat("WWWWWWWWWWWWWWWWWWWWWWWW"),
+                    chat("LETS GOOOOO"),
+                    chat("WOOOOOOOOOOOOO")
+                };
+                addChatMessage(messages[rand() % messages.size()]);
+                m_fields->m_randomChatTimer = 0;
+                m_fields->m_nextChatDelay = 0.1f + (rand() % 3) / 10.0f;
             }
         }
     }
@@ -176,7 +181,7 @@ class $modify(MyPlayLayer, PlayLayer) {
             if (c == '\n') lineCount++;
         }
         
-        if (lineCount >= 10) {
+        if (lineCount >= 19) {
             size_t pos = currentText.find('\n');
             if (pos != std::string::npos) {
                 currentText = currentText.substr(pos + 1);
@@ -201,5 +206,137 @@ class $modify(MyPlayLayer, PlayLayer) {
         m_fields->m_randomChatTimer = 0;
         m_fields->m_isDeathSpamming = false;
         m_fields->m_deathChatTimer = 0;
+    }
+};
+
+class ChatConfigPopup : public geode::Popup {
+protected:
+    geode::TextInput* m_textInput1 = nullptr;
+    geode::TextInput* m_textInput2 = nullptr;
+    geode::TextInput* m_textInput3 = nullptr;
+    
+    bool init(float width, float height) {
+        if (!Popup::init(width, height))
+            return false;
+        
+        this->setTitle("ChatGD Config");
+        auto center = m_mainLayer->getContentSize() / 2;
+        
+        // box 1
+        m_textInput1 = geode::TextInput::create(200.0f, "Hold %...");
+        m_textInput1->setPosition({center.width, center.height + 40});
+        m_textInput1->setFilter("0123456789");
+        m_textInput1->setMaxCharCount(3);
+        m_mainLayer->addChild(m_textInput1);
+        
+        // box 2
+        m_textInput2 = geode::TextInput::create(200.0f, "Go %...");
+        m_textInput2->setPosition({center.width, center.height});
+        m_textInput2->setFilter("0123456789");
+        m_textInput2->setMaxCharCount(3);
+        m_mainLayer->addChild(m_textInput2);
+        
+        // box 3
+        m_textInput3 = geode::TextInput::create(200.0f, "Super Go %...");
+        m_textInput3->setPosition({center.width, center.height - 40});
+        m_textInput3->setFilter("0123456789");
+        m_textInput3->setMaxCharCount(3);
+        m_mainLayer->addChild(m_textInput3);
+
+
+        return true;
+    }
+    
+public:
+    static ChatConfigPopup* create() {
+        auto ret = new ChatConfigPopup();
+        if (ret->init(300.0f, 200.0f)) {
+            ret->autorelease();
+            return ret;
+        }
+        delete ret;
+        return nullptr;
+    }
+
+    void onClose(CCObject* sender) override {
+        // get playlayer
+        auto playLayer = PlayLayer::get();
+        //get id
+        int levelID = playLayer->m_level->m_levelID;
+        // get vals
+        std::string holdStr = m_textInput1->getString();
+        std::string goStr = m_textInput2->getString();
+        std::string superGoStr = m_textInput3->getString();
+        
+        // conv to int
+        auto hold = geode::utils::numFromString<int>(holdStr);
+        auto go = geode::utils::numFromString<int>(goStr);
+        auto superGo = geode::utils::numFromString<int>(superGoStr);
+        
+        if (hold && go && superGo) {
+            Mod::get()->setSavedValue(std::to_string(levelID)+"hold-percent", *hold);
+            Mod::get()->setSavedValue(std::to_string(levelID)+"go-percent", *go);
+            Mod::get()->setSavedValue(std::to_string(levelID)+"supergo-percent", *superGo);
+        }
+        
+        geode::Popup::onClose(sender);
+    }
+};
+
+class $modify(MyPauseLayer, PauseLayer) {
+    void customSetup() {
+        PauseLayer::customSetup();
+        
+        log::info("PauseLayer customSetup called");
+        
+        // find opt menu (slightly fried way)
+        CCNode* optionsButton = nullptr;
+        CCMenu* parentMenu = nullptr;
+        
+        auto children = this->getChildren();
+        if (children) {
+            for (int i = 0; i < children->count(); i++) {
+                auto child = static_cast<CCNode*>(children->objectAtIndex(i));
+                if (!child) continue;
+                
+                if (auto menu = typeinfo_cast<CCMenu*>(child)) {
+                    auto menuChildren = menu->getChildren();
+                    if (!menuChildren) continue;
+                    
+                    for (int j = 0; j < menuChildren->count(); j++) {
+                        auto menuChild = static_cast<CCNode*>(menuChildren->objectAtIndex(j));
+                        if (!menuChild) continue;
+                        
+                        if (menuChild->getID() == "options-button") {
+                            optionsButton = menuChild;
+                            parentMenu = menu;
+                            break;
+                        }
+                    }
+                }
+                if (optionsButton) break;
+            }
+        }
+        
+        if (optionsButton && parentMenu) {
+            // make btn
+            auto myButtonSprite = CCSprite::createWithSpriteFrameName("GJ_likeBtn_001.png");
+            auto myButton = CCMenuItemSpriteExtra::create(
+                myButtonSprite,
+                this,
+                menu_selector(MyPauseLayer::onMyButton)
+            );
+            
+            // put below options
+            auto optionsPos = optionsButton->getPosition();
+            myButton->setPosition(optionsPos.x, optionsPos.y - 100);
+            parentMenu->addChild(myButton);
+        } else {
+            log::error("Options button not found!");
+        }
+    }
+    
+    void onMyButton(CCObject*) {
+        ChatConfigPopup::create()->show();
     }
 };
