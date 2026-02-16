@@ -8,7 +8,15 @@
 	},
 	"id": "memeking16.chatgd",
 	"name": "ChatGD",
-	"version": "v1.0.0-beta.4",
+	"version": "v1.0.0-beta.5",
 	"developer": "MEMEKING16",
-	"description": ""
+	"description": "A mod that adds a chat as if you were live streaming",
+	"issues": {
+		"info": "If you have an issue with the mod please report it here!",
+		"url": "https://github.com/MEME-KING16/ChatGD/issues"
+	},
+	"tags": [
+		"gameplay",
+		"interface"
+	]
 }
