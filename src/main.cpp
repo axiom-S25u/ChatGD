@@ -26,6 +26,16 @@ static std::string chat(const std::string& msg) {
     return randomPlayer() + ": " + msg;
 }
 
+static std::string levelKey(int levelID, const char* suffix) {
+    return std::to_string(levelID) + suffix;
+}
+
+static float loadPercentForLevel(int levelID, const char* suffix, float defaultValue) {
+    auto key = levelKey(levelID, suffix);
+    auto legacyValue = Mod::get()->getSavedValue<int>(key, static_cast<int>(defaultValue));
+    return Mod::get()->getSavedValue<float>(key, static_cast<float>(legacyValue));
+}
+
 class $modify(MyPlayLayer, PlayLayer) {
     struct Fields {
         CCLayer* m_chatBox = nullptr;
@@ -39,15 +49,21 @@ class $modify(MyPlayLayer, PlayLayer) {
         float goPercent = 37;
         float superGoPercent = 80;
     };
+
+public:
+    void reloadThresholds() {
+        if (!m_level) return;
+        m_fields->holdPercent = loadPercentForLevel(m_level->m_levelID, "hold-percent", 22.0f);
+        m_fields->goPercent = loadPercentForLevel(m_level->m_levelID, "go-percent", 37.0f);
+        m_fields->superGoPercent = loadPercentForLevel(m_level->m_levelID, "supergo-percent", 80.0f);
+    }
     
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) {
             return false;
         }
         
-        m_fields->holdPercent = Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"hold-percent", 22.0f);
-        m_fields->goPercent = Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"go-percent", 37.0f);
-        m_fields->superGoPercent = Mod::get()->getSavedValue(std::to_string(level->m_levelID)+"supergo-percent", 80.0f);
+        this->reloadThresholds();
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
         
@@ -261,6 +277,11 @@ public:
     void onClose(CCObject* sender) override {
         // get playlayer
         auto playLayer = PlayLayer::get();
+        if (!playLayer || !playLayer->m_level) {
+            log::error("ChatGD: Could not save config");
+            geode::Popup::onClose(sender);
+            return;
+        }
         //get id
         int levelID = playLayer->m_level->m_levelID;
         // get vals
@@ -269,14 +290,22 @@ public:
         std::string superGoStr = m_textInput3->getString();
         
         // conv to int
-        auto hold = geode::utils::numFromString<int>(holdStr);
-        auto go = geode::utils::numFromString<int>(goStr);
-        auto superGo = geode::utils::numFromString<int>(superGoStr);
+        auto hold = geode::utils::numFromString<float>(holdStr);
+        auto go = geode::utils::numFromString<float>(goStr);
+        auto superGo = geode::utils::numFromString<float>(superGoStr);
         
-        if (hold && go && superGo) {
-            Mod::get()->setSavedValue(std::to_string(levelID)+"hold-percent", *hold);
-            Mod::get()->setSavedValue(std::to_string(levelID)+"go-percent", *go);
-            Mod::get()->setSavedValue(std::to_string(levelID)+"supergo-percent", *superGo);
+        if (hold) {
+            Mod::get()->setSavedValue(levelKey(levelID, "hold-percent"), *hold);
+        }
+        if (go) {
+            Mod::get()->setSavedValue(levelKey(levelID, "go-percent"), *go);
+        }
+        if (superGo) {
+            Mod::get()->setSavedValue(levelKey(levelID, "supergo-percent"), *superGo);
+        }
+
+        if (auto basePlayLayer = typeinfo_cast<PlayLayer*>(playLayer)) {
+            static_cast<MyPlayLayer*>(basePlayLayer)->reloadThresholds();
         }
         
         geode::Popup::onClose(sender);
