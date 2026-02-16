@@ -122,7 +122,6 @@ public:
         }
         
         // hold
-        // TODO: cfg 50% done
         if (progress >= m_fields->holdPercent && progress < m_fields->goPercent) {
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
@@ -139,7 +138,6 @@ public:
             }
         }
         // gooo
-        // TODO: cfg 50% done
         else if (progress >= m_fields->goPercent && progress < m_fields->superGoPercent) {           
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
@@ -155,7 +153,6 @@ public:
             }
         }
         // super go and i was here
-        // TODO: cfg 50% done
         else if (progress >= m_fields->superGoPercent && progress < 99.9999f) {          
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
