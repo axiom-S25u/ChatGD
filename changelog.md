@@ -1,4 +1,10 @@
 # ChatGD Changelog
+## v1.0.0-beta.5
+- Description
+- Tags
+- Issues page
+- Icon
+- Fixed bug where you had to reopen the level for the % changes to apply
 ## v1.0.0-beta.4
 - Updated to geode beta.2
 ## v1.0.0-beta.3
