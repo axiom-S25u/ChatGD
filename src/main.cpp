@@ -48,6 +48,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         float holdPercent = 22;
         float goPercent = 37;
         float superGoPercent = 80;
+        int att = 0;
     };
 
 public:
@@ -207,8 +208,10 @@ public:
     
     void destroyPlayer(PlayerObject* player, GameObject* object) {
         PlayLayer::destroyPlayer(player, object);
-        
-        m_fields->m_isDeathSpamming = true;
+        if(att != 0) {
+            m_fields->m_isDeathSpamming = true;
+        }
+        m_fields->att += 1;
         m_fields->m_deathChatTimer = 0;
         m_fields->m_randomChatTimer = 0;
     }
