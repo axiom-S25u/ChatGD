@@ -208,7 +208,7 @@ public:
     
     void destroyPlayer(PlayerObject* player, GameObject* object) {
         PlayLayer::destroyPlayer(player, object);
-        if(att != 0) {
+        if(m_fields->att != 0) {
             m_fields->m_isDeathSpamming = true;
         }
         m_fields->att += 1;
