@@ -208,7 +208,9 @@ public:
     
     void destroyPlayer(PlayerObject* player, GameObject* object) {
         PlayLayer::destroyPlayer(player, object);
-        if(m_fields->att != 0) {
+        // lwk fried fix but eh it works lol
+        log::info("{}", m_fields->att);
+        if(m_fields->att > 16) { // for somereason this gets called 16 times at the start idk why
             m_fields->m_isDeathSpamming = true;
         }
         m_fields->att += 1;

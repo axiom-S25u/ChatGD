@@ -6,7 +6,8 @@
 - Icon
 - Fixed bug where you had to reopen the level for the % changes to apply
 - Made %s in settings menu persistant
-- Updated to geode beta.3
+- Updated to geode beta.4
+- Fixed bug where first attempt chat thinks you died
 ## v1.0.0-beta.4
 - Updated to geode beta.2
 ## v1.0.0-beta.3
