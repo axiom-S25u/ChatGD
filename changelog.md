@@ -3,7 +3,6 @@
 - Description
 - Tags
 - Issues page
-- Icon
 - Fixed bug where you had to reopen the level for the % changes to apply
 - Made %s in settings menu persistant
 - Updated to geode beta.4
