@@ -48,6 +48,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         float holdPercent = 22;
         float goPercent = 37;
         float superGoPercent = 80;
+        int att = 0;
     };
 
 public:
@@ -207,8 +208,12 @@ public:
     
     void destroyPlayer(PlayerObject* player, GameObject* object) {
         PlayLayer::destroyPlayer(player, object);
-        
-        m_fields->m_isDeathSpamming = true;
+        // lwk fried fix but eh it works lol
+        log::info("{}", m_fields->att);
+        if(m_fields->att > 16) { // for somereason this gets called 16 times at the start idk why
+            m_fields->m_isDeathSpamming = true;
+        }
+        m_fields->att += 1;
         m_fields->m_deathChatTimer = 0;
         m_fields->m_randomChatTimer = 0;
     }
@@ -234,26 +239,54 @@ protected:
         
         this->setTitle("ChatGD Config");
         auto center = m_mainLayer->getContentSize() / 2;
+
+        float holdPercent = 22.0f;
+        float goPercent = 37.0f;
+        float superGoPercent = 80.0f;
+        if (auto playLayer = PlayLayer::get(); playLayer && playLayer->m_level) {
+            auto levelID = playLayer->m_level->m_levelID;
+            holdPercent = loadPercentForLevel(levelID, "hold-percent", 22.0f);
+            goPercent = loadPercentForLevel(levelID, "go-percent", 37.0f);
+            superGoPercent = loadPercentForLevel(levelID, "supergo-percent", 80.0f);
+        }
         
         // box 1
-        m_textInput1 = geode::TextInput::create(200.0f, "Hold %...");
-        m_textInput1->setPosition({center.width, center.height + 40});
+        auto label1 = cocos2d::CCLabelBMFont::create("Hold %:", "bigFont.fnt");
+        label1->setPosition({center.width - 120, center.height + 40});
+        label1->setScale(0.3f);
+        m_mainLayer->addChild(label1);
+
+        m_textInput1 = geode::TextInput::create(200.0f, "");
+        m_textInput1->setPosition({center.width + 50, center.height + 40});
         m_textInput1->setFilter("0123456789");
         m_textInput1->setMaxCharCount(3);
+        m_textInput1->setString(std::to_string(static_cast<int>(holdPercent)));
         m_mainLayer->addChild(m_textInput1);
-        
+
         // box 2
-        m_textInput2 = geode::TextInput::create(200.0f, "Go %...");
-        m_textInput2->setPosition({center.width, center.height});
+        auto label2 = cocos2d::CCLabelBMFont::create("Go %:", "bigFont.fnt");
+        label2->setPosition({center.width - 120, center.height});
+        label2->setScale(0.3f);
+        m_mainLayer->addChild(label2);
+
+        m_textInput2 = geode::TextInput::create(200.0f, "");
+        m_textInput2->setPosition({center.width + 50, center.height});
         m_textInput2->setFilter("0123456789");
         m_textInput2->setMaxCharCount(3);
+        m_textInput2->setString(std::to_string(static_cast<int>(goPercent)));
         m_mainLayer->addChild(m_textInput2);
-        
+
         // box 3
-        m_textInput3 = geode::TextInput::create(200.0f, "Super Go %...");
-        m_textInput3->setPosition({center.width, center.height - 40});
+        auto label3 = cocos2d::CCLabelBMFont::create("Super Go %:", "bigFont.fnt");
+        label3->setPosition({center.width - 120, center.height - 40});
+        label3->setScale(0.3f);
+        m_mainLayer->addChild(label3);
+
+        m_textInput3 = geode::TextInput::create(200.0f, "");
+        m_textInput3->setPosition({center.width + 50, center.height - 40});
         m_textInput3->setFilter("0123456789");
         m_textInput3->setMaxCharCount(3);
+        m_textInput3->setString(std::to_string(static_cast<int>(superGoPercent)));
         m_mainLayer->addChild(m_textInput3);
 
 
