@@ -92,7 +92,11 @@ public:
     
     void checkProgress(float dt) {
         float progress = this->getCurrentPercent();
+        bool inPractice = this->m_isPracticeMode;
+        m_fields->m_chatBox->setVisible(!inPractice);
+        m_fields->m_chatText->setVisible(!inPractice);
         
+        if (inPractice) return;
         // NOOOOOOOO
         if (m_fields->m_isDeathSpamming) {
             m_fields->m_deathChatTimer += dt;

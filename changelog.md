@@ -7,6 +7,7 @@
 - Made %s in settings menu persistant
 - Updated to geode beta.4
 - Fixed bug where first attempt chat thinks you died
+- Chat disabled in practice
 ## v1.0.0-beta.4
 - Updated to geode beta.2
 ## v1.0.0-beta.3
