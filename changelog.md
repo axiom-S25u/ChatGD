@@ -1,4 +1,6 @@
 # ChatGD Changelog
+## v1.0.0
+- UPDATED TO GEODE v5 WOOOOO ITS OUT
 ## v1.0.0-beta.5
 - Description
 - Tags
