@@ -36,6 +36,11 @@ static float loadPercentForLevel(int levelID, const char* suffix, float defaultV
     return Mod::get()->getSavedValue<float>(key, static_cast<float>(legacyValue));
 }
 
+static bool loadDisabledForLevel(int levelID, const char* suffix, bool defaultValue) {
+    auto key = levelKey(levelID, suffix);
+    return Mod::get()->getSavedValue<bool>(key, defaultValue);
+}
+
 class $modify(MyPlayLayer, PlayLayer) {
     struct Fields {
         CCLayer* m_chatBox = nullptr;
@@ -49,6 +54,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         float goPercent = 37;
         float superGoPercent = 80;
         int att = 0;
+        bool enabled = true;
     };
 
 public:
@@ -57,6 +63,7 @@ public:
         m_fields->holdPercent = loadPercentForLevel(m_level->m_levelID, "hold-percent", 22.0f);
         m_fields->goPercent = loadPercentForLevel(m_level->m_levelID, "go-percent", 37.0f);
         m_fields->superGoPercent = loadPercentForLevel(m_level->m_levelID, "supergo-percent", 80.0f);
+        m_fields->enabled = loadDisabledForLevel(m_level->m_levelID, "enabled", true);
     }
     
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
@@ -93,10 +100,11 @@ public:
     void checkProgress(float dt) {
         float progress = this->getCurrentPercent();
         bool inPractice = this->m_isPracticeMode;
-        m_fields->m_chatBox->setVisible(!inPractice);
-        m_fields->m_chatText->setVisible(!inPractice);
+        bool visible = !inPractice && !m_fields->enabled;
+        m_fields->m_chatBox->setVisible(visible);
+        m_fields->m_chatText->setVisible(visible);
         
-        if (inPractice) return;
+        if (!visible) return;
         // NOOOOOOOO
         if (m_fields->m_isDeathSpamming) {
             m_fields->m_deathChatTimer += dt;
@@ -236,6 +244,7 @@ protected:
     geode::TextInput* m_textInput1 = nullptr;
     geode::TextInput* m_textInput2 = nullptr;
     geode::TextInput* m_textInput3 = nullptr;
+    CCMenuItemToggler* m_enableToggle = nullptr;
     
     bool init(float width, float height) {
         if (!Popup::init(width, height))
@@ -247,21 +256,23 @@ protected:
         float holdPercent = 22.0f;
         float goPercent = 37.0f;
         float superGoPercent = 80.0f;
+        bool enabled = true;
         if (auto playLayer = PlayLayer::get(); playLayer && playLayer->m_level) {
             auto levelID = playLayer->m_level->m_levelID;
             holdPercent = loadPercentForLevel(levelID, "hold-percent", 22.0f);
             goPercent = loadPercentForLevel(levelID, "go-percent", 37.0f);
             superGoPercent = loadPercentForLevel(levelID, "supergo-percent", 80.0f);
+            enabled = loadDisabledForLevel(levelID, "enabled", true);
         }
         
         // box 1
         auto label1 = cocos2d::CCLabelBMFont::create("Hold %:", "bigFont.fnt");
-        label1->setPosition({center.width - 120, center.height + 40});
+        label1->setPosition({center.width - 120, center.height + 60});
         label1->setScale(0.3f);
         m_mainLayer->addChild(label1);
 
         m_textInput1 = geode::TextInput::create(200.0f, "");
-        m_textInput1->setPosition({center.width + 50, center.height + 40});
+        m_textInput1->setPosition({center.width + 50, center.height + 60});
         m_textInput1->setFilter("0123456789");
         m_textInput1->setMaxCharCount(3);
         m_textInput1->setString(std::to_string(static_cast<int>(holdPercent)));
@@ -269,12 +280,12 @@ protected:
 
         // box 2
         auto label2 = cocos2d::CCLabelBMFont::create("Go %:", "bigFont.fnt");
-        label2->setPosition({center.width - 120, center.height});
+        label2->setPosition({center.width - 120, center.height + 20});
         label2->setScale(0.3f);
         m_mainLayer->addChild(label2);
 
         m_textInput2 = geode::TextInput::create(200.0f, "");
-        m_textInput2->setPosition({center.width + 50, center.height});
+        m_textInput2->setPosition({center.width + 50, center.height + 20});
         m_textInput2->setFilter("0123456789");
         m_textInput2->setMaxCharCount(3);
         m_textInput2->setString(std::to_string(static_cast<int>(goPercent)));
@@ -282,20 +293,36 @@ protected:
 
         // box 3
         auto label3 = cocos2d::CCLabelBMFont::create("Super Go %:", "bigFont.fnt");
-        label3->setPosition({center.width - 120, center.height - 40});
+        label3->setPosition({center.width - 120, center.height - 20});
         label3->setScale(0.3f);
         m_mainLayer->addChild(label3);
 
         m_textInput3 = geode::TextInput::create(200.0f, "");
-        m_textInput3->setPosition({center.width + 50, center.height - 40});
+        m_textInput3->setPosition({center.width + 50, center.height - 20});
         m_textInput3->setFilter("0123456789");
         m_textInput3->setMaxCharCount(3);
         m_textInput3->setString(std::to_string(static_cast<int>(superGoPercent)));
         m_mainLayer->addChild(m_textInput3);
 
+        // toggle
+        auto label4 = cocos2d::CCLabelBMFont::create("Enabled:", "bigFont.fnt");
+        label4->setPosition({center.width - 120, center.height - 60});
+        label4->setScale(0.3f);
+        m_mainLayer->addChild(label4);
+
+        auto toggleMenu = CCMenu::create();
+        toggleMenu->setPosition({center.width + 50, center.height - 60});
+        m_enableToggle = CCMenuItemToggler::createWithStandardSprites(
+            this, menu_selector(ChatConfigPopup::onToggle), 0.6f
+        );
+        m_enableToggle->toggle(!enabled);
+        toggleMenu->addChild(m_enableToggle);
+        m_mainLayer->addChild(toggleMenu);
 
         return true;
     }
+
+    void onToggle(CCObject*) {}
     
 public:
     static ChatConfigPopup* create() {
@@ -323,20 +350,15 @@ public:
         std::string goStr = m_textInput2->getString();
         std::string superGoStr = m_textInput3->getString();
         
-        // conv to int
         auto hold = geode::utils::numFromString<float>(holdStr);
         auto go = geode::utils::numFromString<float>(goStr);
         auto superGo = geode::utils::numFromString<float>(superGoStr);
         
-        if (hold) {
-            Mod::get()->setSavedValue(levelKey(levelID, "hold-percent"), *hold);
-        }
-        if (go) {
-            Mod::get()->setSavedValue(levelKey(levelID, "go-percent"), *go);
-        }
-        if (superGo) {
-            Mod::get()->setSavedValue(levelKey(levelID, "supergo-percent"), *superGo);
-        }
+        if (hold) Mod::get()->setSavedValue(levelKey(levelID, "hold-percent"), *hold);
+        if (go) Mod::get()->setSavedValue(levelKey(levelID, "go-percent"), *go);
+        if (superGo) Mod::get()->setSavedValue(levelKey(levelID, "supergo-percent"), *superGo);
+
+        Mod::get()->setSavedValue(levelKey(levelID, "enabled"), !m_enableToggle->isToggled());
 
         if (auto basePlayLayer = typeinfo_cast<PlayLayer*>(playLayer)) {
             static_cast<MyPlayLayer*>(basePlayLayer)->reloadThresholds();

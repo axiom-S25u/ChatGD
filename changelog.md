@@ -8,6 +8,7 @@
 - Updated to geode beta.4
 - Fixed bug where first attempt chat thinks you died
 - Chat disabled in practice
+- Toggleable disable
 ## v1.0.0-beta.4
 - Updated to geode beta.2
 ## v1.0.0-beta.3
