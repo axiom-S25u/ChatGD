@@ -1,6 +1,7 @@
 # ChatGD Changelog
 ## v1.0.0
 - UPDATED TO GEODE v5 WOOOOO ITS OUT
+- Made no go and stuff like that more intense based on % (WIP)
 ## v1.0.0-beta.5
 - Description
 - Tags

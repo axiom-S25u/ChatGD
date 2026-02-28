@@ -49,6 +49,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         float m_randomChatTimer = 0.0f;
         float m_nextChatDelay = 0.5f;
         float m_deathChatTimer = 0.0f;
+        float m_deathSpamDuration = 2.0f;
         bool m_isDeathSpamming = false;
         float holdPercent = 22;
         float goPercent = 37;
@@ -109,7 +110,7 @@ public:
         if (m_fields->m_isDeathSpamming) {
             m_fields->m_deathChatTimer += dt;
             
-            if (m_fields->m_deathChatTimer >= 2.0f) {
+            if (m_fields->m_deathChatTimer >= m_fields->m_deathSpamDuration) {
                 m_fields->m_isDeathSpamming = false;
                 m_fields->m_deathChatTimer = 0;
             } else {
@@ -128,7 +129,6 @@ public:
                     };
                     addChatMessage(deathMessages[rand() % deathMessages.size()]);
                     m_fields->m_randomChatTimer = 0;
-                    m_fields->m_nextChatDelay = 0.1f + (rand() % 10) / 10.0f;
                 }
             }
             return;
@@ -147,11 +147,12 @@ public:
                 };
                 addChatMessage(messages[rand() % messages.size()]);
                 m_fields->m_randomChatTimer = 0;
-                m_fields->m_nextChatDelay = 0.1f + (rand() % 10) / 10.0f;
+                float t = (progress - m_fields->holdPercent) / (m_fields->goPercent - m_fields->holdPercent);
+                m_fields->m_nextChatDelay = 0.3f - (t * 0.25f);
             }
         }
         // gooo
-        else if (progress >= m_fields->goPercent && progress < m_fields->superGoPercent) {           
+        else if (progress >= m_fields->goPercent && progress < m_fields->superGoPercent) {
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
@@ -162,11 +163,12 @@ public:
                 };
                 addChatMessage(messages[rand() % messages.size()]);
                 m_fields->m_randomChatTimer = 0;
-                m_fields->m_nextChatDelay = 0.1f + (rand() % 6) / 10.0f;
+                float t = (progress - m_fields->goPercent) / (m_fields->superGoPercent - m_fields->goPercent);
+                m_fields->m_nextChatDelay = 0.2f - (t * 0.17f);
             }
         }
-        // super go and i was here
-        else if (progress >= m_fields->superGoPercent && progress < 99.9999f) {          
+        // super go
+        else if (progress >= m_fields->superGoPercent && progress < 99.9999f) {
             m_fields->m_randomChatTimer += dt;
             if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
@@ -178,9 +180,10 @@ public:
                 };
                 addChatMessage(messages[rand() % messages.size()]);
                 m_fields->m_randomChatTimer = 0;
-                m_fields->m_nextChatDelay = 0.1f + (rand() % 4) / 10.0f;
+                float t = (progress - m_fields->superGoPercent) / (99.9999f - m_fields->superGoPercent);
+                m_fields->m_nextChatDelay = 0.15f - (t * 0.14f); // 0.4s -> 0.01s
             }
-        } 
+        }
         // 100%: gg
         else if (progress > 99.9999f) {
             m_fields->m_randomChatTimer += dt;
@@ -222,20 +225,20 @@ public:
         PlayLayer::destroyPlayer(player, object);
         // lwk fried fix but eh it works lol
         log::info("{}", m_fields->att);
-        if(m_fields->att > 16) { // for somereason this gets called 16 times at the start idk why
+        if(m_fields->att > 16 && !m_fields->m_isDeathSpamming) {
             m_fields->m_isDeathSpamming = true;
+            float progress = this->getCurrentPercent();
+            float t = progress / 100.0f;
+            m_fields->m_deathSpamDuration = 2.0f + (t * t * 28.0f);
+            m_fields->m_nextChatDelay = 1.5f - (t * 1.49f);
         }
         m_fields->att += 1;
-        m_fields->m_deathChatTimer = 0;
-        m_fields->m_randomChatTimer = 0;
     }
     
     void resetLevel() {
         PlayLayer::resetLevel();
         
-        m_fields->m_randomChatTimer = 0;
-        m_fields->m_isDeathSpamming = false;
-        m_fields->m_deathChatTimer = 0;
+        // m_fields->m_randomChatTimer = 0;
     }
 };
 
