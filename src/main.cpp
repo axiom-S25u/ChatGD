@@ -181,7 +181,7 @@ public:
                 addChatMessage(messages[rand() % messages.size()]);
                 m_fields->m_randomChatTimer = 0;
                 float t = (progress - m_fields->superGoPercent) / (99.9999f - m_fields->superGoPercent);
-                m_fields->m_nextChatDelay = 0.15f - (t * 0.14f); // 0.4s -> 0.01s
+                m_fields->m_nextChatDelay = 0.15f - (t * 0.14f);
             }
         }
         // 100%: gg
@@ -237,8 +237,6 @@ public:
     
     void resetLevel() {
         PlayLayer::resetLevel();
-        
-        // m_fields->m_randomChatTimer = 0;
     }
 };
 
