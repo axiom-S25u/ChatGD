@@ -229,8 +229,8 @@ public:
             m_fields->m_isDeathSpamming = true;
             float progress = this->getCurrentPercent();
             float t = progress / 100.0f;
-            m_fields->m_deathSpamDuration = 2.0f + (t * t * 28.0f);
-            m_fields->m_nextChatDelay = 1.5f - (t * 1.49f);
+            m_fields->m_deathSpamDuration = 2.0f + (t * t * 12.0f);
+            m_fields->m_nextChatDelay = 0.5f - (t * 0.49f);
         }
         m_fields->att += 1;
     }
