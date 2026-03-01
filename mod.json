@@ -19,5 +19,12 @@
 	"tags": [
 		"gameplay",
 		"interface"
-	]
+	],
+	"settings": {
+        "enabled-in-practice": {
+            "name": "Enabled in practice mode",
+            "type": "bool",
+            "default": false
+        }
+    }
 }

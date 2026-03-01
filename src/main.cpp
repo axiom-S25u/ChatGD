@@ -8,6 +8,7 @@
 using namespace geode::prelude;
 
 static const std::vector<std::string> GD_PLAYERS = {
+    // Streamers
     "Michigun", "Viprin", "Riot", "Juniper", "Wulzy",
     "EVW", "Doggie", "Nexus", "AeonAir", "Tride",
     "Cyclic", "Knobbelboy", "Sunix", "Technical49", "Dorami",
@@ -15,7 +16,9 @@ static const std::vector<std::string> GD_PLAYERS = {
     "Cursed", "BlassCFB", "MiKhaXx", "Mullsy", "Luqualizer",
     "Npesta", "xanii", "BTD6", "GuitarHeroStyles", "Cataclysm",
     "Krazyman50", "Zobros", "Sea1997", "Pennutoh", "FunnyGame",
-    "TrusTa", "RicoLP", "ViPriN", "ChaSe", "Lemons"
+    "TrusTa", "RicoLP", "ViPriN", "ChaSe", "Lemons",
+    // Contriubtors
+    "Axiom", "Human"
 };
 
 static std::string randomPlayer() {
@@ -61,10 +64,11 @@ class $modify(MyPlayLayer, PlayLayer) {
 public:
     void reloadThresholds() {
         if (!m_level) return;
-        m_fields->holdPercent = loadPercentForLevel(m_level->m_levelID, "hold-percent", 22.0f);
-        m_fields->goPercent = loadPercentForLevel(m_level->m_levelID, "go-percent", 37.0f);
-        m_fields->superGoPercent = loadPercentForLevel(m_level->m_levelID, "supergo-percent", 80.0f);
-        m_fields->enabled = loadDisabledForLevel(m_level->m_levelID, "enabled", true);
+        auto fields = m_fields.self();
+        fields->holdPercent = loadPercentForLevel(m_level->m_levelID, "hold-percent", 22.0f);
+        fields->goPercent = loadPercentForLevel(m_level->m_levelID, "go-percent", 37.0f);
+        fields->superGoPercent = loadPercentForLevel(m_level->m_levelID, "supergo-percent", 80.0f);
+        fields->enabled = loadDisabledForLevel(m_level->m_levelID, "enabled", true);
     }
     
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
@@ -74,22 +78,23 @@ public:
         
         this->reloadThresholds();
 
+        auto fields = m_fields.self();
         auto winSize = CCDirector::sharedDirector()->getWinSize();
         
         // chat box
-        m_fields->m_chatBox = CCLayerColor::create({0, 0, 0, 180}, 100.0f, 150.0f);
-        m_fields->m_chatBox->setPosition(winSize.width - 110, 10); //pos
-        m_fields->m_chatBox->setZOrder(20);
-        this->addChild(m_fields->m_chatBox);
+        fields->m_chatBox = CCLayerColor::create({0, 0, 0, 180}, 100.0f, 150.0f);
+        fields->m_chatBox->setPosition(winSize.width - 110, 10); //pos
+        fields->m_chatBox->setZOrder(20);
+        this->addChild(fields->m_chatBox);
         
         // text
-        m_fields->m_chatText = CCLabelBMFont::create("", "chatFont.fnt");
-        m_fields->m_chatText->setScale(0.4f);
-        m_fields->m_chatText->setAnchorPoint({0, 1});
-        m_fields->m_chatText->setPosition(winSize.width - 105, 145);
-        m_fields->m_chatText->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
-        m_fields->m_chatText->setZOrder(101);
-        this->addChild(m_fields->m_chatText);
+        fields->m_chatText = CCLabelBMFont::create("", "chatFont.fnt");
+        fields->m_chatText->setScale(0.4f);
+        fields->m_chatText->setAnchorPoint({0, 1});
+        fields->m_chatText->setPosition(winSize.width - 105, 145);
+        fields->m_chatText->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+        fields->m_chatText->setZOrder(101);
+        this->addChild(fields->m_chatText);
         
         log::info("ChatGD: Init complete");
         
@@ -99,23 +104,24 @@ public:
     }
     
     void checkProgress(float dt) {
+        auto fields = m_fields.self();
         float progress = this->getCurrentPercent();
-        bool inPractice = this->m_isPracticeMode;
-        bool visible = !inPractice && !m_fields->enabled;
-        m_fields->m_chatBox->setVisible(visible);
-        m_fields->m_chatText->setVisible(visible);
+        bool inPractice = this->m_isPracticeMode && !Mod::get()->getSettingValue<bool>("enabled-in-practice");
+        bool visible = !inPractice && !fields->enabled;
+        fields->m_chatBox->setVisible(visible);
+        fields->m_chatText->setVisible(visible);
         
         if (!visible) return;
         // NOOOOOOOO
-        if (m_fields->m_isDeathSpamming) {
-            m_fields->m_deathChatTimer += dt;
+        if (fields->m_isDeathSpamming) {
+            fields->m_deathChatTimer += dt;
             
-            if (m_fields->m_deathChatTimer >= m_fields->m_deathSpamDuration) {
-                m_fields->m_isDeathSpamming = false;
-                m_fields->m_deathChatTimer = 0;
+            if (fields->m_deathChatTimer >= fields->m_deathSpamDuration) {
+                fields->m_isDeathSpamming = false;
+                fields->m_deathChatTimer = 0;
             } else {
-                m_fields->m_randomChatTimer += dt;
-                if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
+                fields->m_randomChatTimer += dt;
+                if (fields->m_randomChatTimer >= fields->m_nextChatDelay) {
                     std::vector<std::string> deathMessages = {
                         chat("RIP"),
                         chat("NOOOO"),
@@ -128,16 +134,16 @@ public:
                         chat("unlucky")
                     };
                     addChatMessage(deathMessages[rand() % deathMessages.size()]);
-                    m_fields->m_randomChatTimer = 0;
+                    fields->m_randomChatTimer = 0;
                 }
             }
             return;
         }
         
         // hold
-        if (progress >= m_fields->holdPercent && progress < m_fields->goPercent) {
-            m_fields->m_randomChatTimer += dt;
-            if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
+        if (progress >= fields->holdPercent && progress < fields->goPercent) {
+            fields->m_randomChatTimer += dt;
+            if (fields->m_randomChatTimer >= fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
                     chat("holdlldldldl"),
                     chat("HOLD IT"),
@@ -146,15 +152,15 @@ public:
                     chat("HOLDDDDDDDDDDDDDDDDDDD")
                 };
                 addChatMessage(messages[rand() % messages.size()]);
-                m_fields->m_randomChatTimer = 0;
-                float t = (progress - m_fields->holdPercent) / (m_fields->goPercent - m_fields->holdPercent);
-                m_fields->m_nextChatDelay = 0.3f - (t * 0.25f);
+                fields->m_randomChatTimer = 0;
+                float t = (progress - fields->holdPercent) / (fields->goPercent - fields->holdPercent);
+                fields->m_nextChatDelay = 0.3f - (t * 0.25f);
             }
         }
         // gooo
-        else if (progress >= m_fields->goPercent && progress < m_fields->superGoPercent) {
-            m_fields->m_randomChatTimer += dt;
-            if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
+        else if (progress >= fields->goPercent && progress < fields->superGoPercent) {
+            fields->m_randomChatTimer += dt;
+            if (fields->m_randomChatTimer >= fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
                     chat("GOOOO"),
                     chat("LETS GOOOOO"),
@@ -162,15 +168,15 @@ public:
                     chat("GOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO"),
                 };
                 addChatMessage(messages[rand() % messages.size()]);
-                m_fields->m_randomChatTimer = 0;
-                float t = (progress - m_fields->goPercent) / (m_fields->superGoPercent - m_fields->goPercent);
-                m_fields->m_nextChatDelay = 0.2f - (t * 0.17f);
+                fields->m_randomChatTimer = 0;
+                float t = (progress - fields->goPercent) / (fields->superGoPercent - fields->goPercent);
+                fields->m_nextChatDelay = 0.2f - (t * 0.17f);
             }
         }
         // super go
-        else if (progress >= m_fields->superGoPercent && progress < 99.9999f) {
-            m_fields->m_randomChatTimer += dt;
-            if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
+        else if (progress >= fields->superGoPercent && progress < 99.9999f) {
+            fields->m_randomChatTimer += dt;
+            if (fields->m_randomChatTimer >= fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
                     chat("SUPER GOOOOOOOOOOOOOOOOOOOOOO"),
                     chat("SUPERGOOOOOOOOOOOOOOOOOOOOOOOO!!!!!!!!!!!!"),
@@ -179,15 +185,15 @@ public:
                     chat("GOOOOO GOOOOOO GOOOOOOOO")
                 };
                 addChatMessage(messages[rand() % messages.size()]);
-                m_fields->m_randomChatTimer = 0;
-                float t = (progress - m_fields->superGoPercent) / (99.9999f - m_fields->superGoPercent);
-                m_fields->m_nextChatDelay = 0.15f - (t * 0.14f);
+                fields->m_randomChatTimer = 0;
+                float t = (progress - fields->superGoPercent) / (99.9999f - fields->superGoPercent);
+                fields->m_nextChatDelay = 0.15f - (t * 0.14f);
             }
         }
         // 100%: gg
         else if (progress > 99.9999f) {
-            m_fields->m_randomChatTimer += dt;
-            if (m_fields->m_randomChatTimer >= m_fields->m_nextChatDelay) {
+            fields->m_randomChatTimer += dt;
+            if (fields->m_randomChatTimer >= fields->m_nextChatDelay) {
                 std::vector<std::string> messages = {
                     chat("GG"),
                     chat("GGS"),
@@ -196,14 +202,15 @@ public:
                     chat("WOOOOOOOOOOOOO")
                 };
                 addChatMessage(messages[rand() % messages.size()]);
-                m_fields->m_randomChatTimer = 0;
-                m_fields->m_nextChatDelay = 0.1f + (rand() % 3) / 10.0f;
+                fields->m_randomChatTimer = 0;
+                fields->m_nextChatDelay = 0.1f + (rand() % 3) / 10.0f;
             }
         }
     }
     
     void addChatMessage(std::string message) {
-        std::string currentText = m_fields->m_chatText->getString();
+        auto fields = m_fields.self();
+        std::string currentText = fields->m_chatText->getString();
         
         int lineCount = 0;
         for (char c : currentText) {
@@ -218,21 +225,22 @@ public:
         }
         
         std::string newText = currentText.empty() ? message : currentText + "\n" + message;
-        m_fields->m_chatText->setString(newText.c_str());
+        fields->m_chatText->setString(newText.c_str());
     }
     
     void destroyPlayer(PlayerObject* player, GameObject* object) {
         PlayLayer::destroyPlayer(player, object);
+        auto fields = m_fields.self();
         // lwk fried fix but eh it works lol
-        log::info("{}", m_fields->att);
-        if(m_fields->att > 16 && !m_fields->m_isDeathSpamming) {
-            m_fields->m_isDeathSpamming = true;
+        log::info("{}", fields->att);
+        if(fields->att > 16 && !fields->m_isDeathSpamming) {
+            fields->m_isDeathSpamming = true;
             float progress = this->getCurrentPercent();
             float t = progress / 100.0f;
-            m_fields->m_deathSpamDuration = 2.0f + (t * t * 12.0f);
-            m_fields->m_nextChatDelay = 0.5f - (t * 0.49f);
+            fields->m_deathSpamDuration = 2.0f + (t * t * 12.0f);
+            fields->m_nextChatDelay = 0.5f - (t * 0.49f);
         }
-        m_fields->att += 1;
+        fields->att += 1;
     }
     
     void resetLevel() {
