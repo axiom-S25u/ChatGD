@@ -277,12 +277,12 @@ protected:
         
         // box 1
         auto label1 = cocos2d::CCLabelBMFont::create("Hold %:", "bigFont.fnt");
-        label1->setPosition({center.width - 120, center.height + 60});
+        label1->setPosition({center.width - 120, center.height + 40});
         label1->setScale(0.3f);
         m_mainLayer->addChild(label1);
 
         m_textInput1 = geode::TextInput::create(200.0f, "");
-        m_textInput1->setPosition({center.width + 50, center.height + 60});
+        m_textInput1->setPosition({center.width + 30, center.height + 40});
         m_textInput1->setFilter("0123456789");
         m_textInput1->setMaxCharCount(3);
         m_textInput1->setString(std::to_string(static_cast<int>(holdPercent)));
@@ -290,12 +290,12 @@ protected:
 
         // box 2
         auto label2 = cocos2d::CCLabelBMFont::create("Go %:", "bigFont.fnt");
-        label2->setPosition({center.width - 120, center.height + 20});
+        label2->setPosition({center.width - 127, center.height + 0});
         label2->setScale(0.3f);
         m_mainLayer->addChild(label2);
 
         m_textInput2 = geode::TextInput::create(200.0f, "");
-        m_textInput2->setPosition({center.width + 50, center.height + 20});
+        m_textInput2->setPosition({center.width + 30, center.height + 0});
         m_textInput2->setFilter("0123456789");
         m_textInput2->setMaxCharCount(3);
         m_textInput2->setString(std::to_string(static_cast<int>(goPercent)));
@@ -303,12 +303,12 @@ protected:
 
         // box 3
         auto label3 = cocos2d::CCLabelBMFont::create("Super Go %:", "bigFont.fnt");
-        label3->setPosition({center.width - 120, center.height - 20});
+        label3->setPosition({center.width - 111, center.height - 40});
         label3->setScale(0.3f);
         m_mainLayer->addChild(label3);
 
         m_textInput3 = geode::TextInput::create(200.0f, "");
-        m_textInput3->setPosition({center.width + 50, center.height - 20});
+        m_textInput3->setPosition({center.width + 30, center.height - 40});
         m_textInput3->setFilter("0123456789");
         m_textInput3->setMaxCharCount(3);
         m_textInput3->setString(std::to_string(static_cast<int>(superGoPercent)));
@@ -316,12 +316,12 @@ protected:
 
         // toggle
         auto label4 = cocos2d::CCLabelBMFont::create("Enabled:", "bigFont.fnt");
-        label4->setPosition({center.width - 120, center.height - 60});
+        label4->setPosition({center.width - 118, center.height - 80});
         label4->setScale(0.3f);
         m_mainLayer->addChild(label4);
 
         auto toggleMenu = CCMenu::create();
-        toggleMenu->setPosition({center.width + 50, center.height - 60});
+        toggleMenu->setPosition({center.width + 30, center.height - 80});
         m_enableToggle = CCMenuItemToggler::createWithStandardSprites(
             this, menu_selector(ChatConfigPopup::onToggle), 0.6f
         );
@@ -415,7 +415,7 @@ class $modify(MyPauseLayer, PauseLayer) {
         
         if (optionsButton && parentMenu) {
             // make btn
-            auto myButtonSprite = CCSprite::createWithSpriteFrameName("GJ_likeBtn_001.png");
+            auto myButtonSprite = CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png");
             auto myButton = CCMenuItemSpriteExtra::create(
                 myButtonSprite,
                 this,
