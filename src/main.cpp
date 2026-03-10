@@ -17,8 +17,9 @@ static const std::vector<std::string> GD_PLAYERS = {
     "Npesta", "xanii", "BTD6", "GuitarHeroStyles", "Cataclysm",
     "Krazyman50", "Zobros", "Sea1997", "Pennutoh", "FunnyGame",
     "TrusTa", "RicoLP", "ViPriN", "ChaSe", "Lemons",
+    "Vortrox",
     // Contriubtors
-    "Axiom", "Human"
+    "Axiom", "Human", "siniNight"
 };
 
 static std::string randomPlayer() {
