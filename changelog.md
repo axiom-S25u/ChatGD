@@ -1,4 +1,10 @@
 # ChatGD Changelog
+## v1.0.0
+- UPDATED TO GEODE v5 WOOOOO ITS OUT
+- Made no go and stuff like that more intense based on % (speed tweak needed)
+- Enable or disable in practice mode (global settings)
+- Optimizations
+- icon
 ## v1.0.0-beta.5
 - Description
 - Tags
