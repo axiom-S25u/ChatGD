@@ -96,9 +96,7 @@ public:
         fields->m_chatText->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
         fields->m_chatText->setZOrder(101);
         this->addChild(fields->m_chatText);
-        
-        log::info("ChatGD: Init complete");
-        
+                
         this->schedule(schedule_selector(MyPlayLayer::checkProgress));
         
         return true;
@@ -233,7 +231,6 @@ public:
         PlayLayer::destroyPlayer(player, object);
         auto fields = m_fields.self();
         // lwk fried fix but eh it works lol
-        log::info("{}", fields->att);
         if(fields->att > 16 && !fields->m_isDeathSpamming) {
             fields->m_isDeathSpamming = true;
             float progress = this->getCurrentPercent();
@@ -380,10 +377,7 @@ public:
 
 class $modify(MyPauseLayer, PauseLayer) {
     void customSetup() {
-        PauseLayer::customSetup();
-        
-        log::info("PauseLayer customSetup called");
-        
+        PauseLayer::customSetup();        
         // find opt menu (slightly fried way)
         CCNode* optionsButton = nullptr;
         CCMenu* parentMenu = nullptr;
