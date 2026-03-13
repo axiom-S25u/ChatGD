@@ -86,8 +86,8 @@ public:
         fields->m_chatBox = CCLayerColor::create({0, 0, 0, 180}, 100.0f, 150.0f);
         fields->m_chatBox->setPosition(winSize.width - 110, 10); //pos
         fields->m_chatBox->setZOrder(20);
-        this->addChild(fields->m_chatBox);
-        
+        this->m_uiLayer->addChild(fields->m_chatBox);
+
         // text
         fields->m_chatText = CCLabelBMFont::create("", "chatFont.fnt");
         fields->m_chatText->setScale(0.4f);
@@ -95,7 +95,7 @@ public:
         fields->m_chatText->setPosition(winSize.width - 105, 145);
         fields->m_chatText->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
         fields->m_chatText->setZOrder(101);
-        this->addChild(fields->m_chatText);
+        this->m_uiLayer->addChild(fields->m_chatText);
                 
         this->schedule(schedule_selector(MyPlayLayer::checkProgress));
         
@@ -207,23 +207,61 @@ public:
         }
     }
     
+    static std::string wrapMessage(const std::string& msg, int maxChars = 28) {
+        std::string result;
+        int lineLen = 0;
+        for (size_t i = 0; i < msg.size(); ) {
+            size_t wordEnd = msg.find(' ', i);
+            if (wordEnd == std::string::npos) wordEnd = msg.size();
+            std::string word = msg.substr(i, wordEnd - i);
+
+            while ((int)word.size() > maxChars) {
+                int space = maxChars - lineLen;
+                if (!result.empty() && lineLen > 0) result += '\n';
+                else if (!result.empty()) {}
+                result += word.substr(0, space);
+                word = word.substr(space);
+                result += '\n';
+                lineLen = 0;
+            }
+
+            if (lineLen > 0 && lineLen + 1 + (int)word.size() > maxChars) {
+                result += '\n';
+                lineLen = 0;
+            }
+            if (lineLen > 0) { result += ' '; lineLen++; }
+            result += word;
+            lineLen += (int)word.size();
+
+            i = wordEnd;
+            while (i < msg.size() && msg[i] == ' ') i++;
+        }
+        return result;
+    }
+
     void addChatMessage(std::string message) {
         auto fields = m_fields.self();
+        std::string wrapped = wrapMessage(message);
         std::string currentText = fields->m_chatText->getString();
-        
+
         int lineCount = 0;
         for (char c : currentText) {
             if (c == '\n') lineCount++;
         }
-        
-        if (lineCount >= 19) {
-            size_t pos = currentText.find('\n');
-            if (pos != std::string::npos) {
-                currentText = currentText.substr(pos + 1);
-            }
+
+        int newLines = 0;
+        for (char c : wrapped) {
+            if (c == '\n') newLines++;
         }
-        
-        std::string newText = currentText.empty() ? message : currentText + "\n" + message;
+
+        while (lineCount + newLines + 1 > 19) {
+            size_t pos = currentText.find('\n');
+            if (pos == std::string::npos) { currentText.clear(); lineCount = 0; break; }
+            currentText = currentText.substr(pos + 1);
+            lineCount--;
+        }
+
+        std::string newText = currentText.empty() ? wrapped : currentText + "\n" + wrapped;
         fields->m_chatText->setString(newText.c_str());
     }
     
@@ -357,13 +395,9 @@ public:
         std::string goStr = m_textInput2->getString();
         std::string superGoStr = m_textInput3->getString();
         
-        auto hold = geode::utils::numFromString<float>(holdStr);
-        auto go = geode::utils::numFromString<float>(goStr);
-        auto superGo = geode::utils::numFromString<float>(superGoStr);
-        
-        if (hold) Mod::get()->setSavedValue(levelKey(levelID, "hold-percent"), *hold);
-        if (go) Mod::get()->setSavedValue(levelKey(levelID, "go-percent"), *go);
-        if (superGo) Mod::get()->setSavedValue(levelKey(levelID, "supergo-percent"), *superGo);
+        Mod::get()->setSavedValue(levelKey(levelID, "hold-percent"), geode::utils::numFromString<float>(holdStr).unwrapOrDefault());
+        Mod::get()->setSavedValue(levelKey(levelID, "go-percent"), geode::utils::numFromString<float>(goStr).unwrapOrDefault());
+        Mod::get()->setSavedValue(levelKey(levelID, "supergo-percent"), geode::utils::numFromString<float>(superGoStr).unwrapOrDefault());
 
         Mod::get()->setSavedValue(levelKey(levelID, "enabled"), !m_enableToggle->isToggled());
 
@@ -377,52 +411,23 @@ public:
 
 class $modify(MyPauseLayer, PauseLayer) {
     void customSetup() {
-        PauseLayer::customSetup();        
-        // find opt menu (slightly fried way)
-        CCNode* optionsButton = nullptr;
-        CCMenu* parentMenu = nullptr;
-        
-        auto children = this->getChildren();
-        if (children) {
-            for (int i = 0; i < children->count(); i++) {
-                auto child = static_cast<CCNode*>(children->objectAtIndex(i));
-                if (!child) continue;
-                
-                if (auto menu = typeinfo_cast<CCMenu*>(child)) {
-                    auto menuChildren = menu->getChildren();
-                    if (!menuChildren) continue;
-                    
-                    for (int j = 0; j < menuChildren->count(); j++) {
-                        auto menuChild = static_cast<CCNode*>(menuChildren->objectAtIndex(j));
-                        if (!menuChild) continue;
-                        
-                        if (menuChild->getID() == "options-button") {
-                            optionsButton = menuChild;
-                            parentMenu = menu;
-                            break;
-                        }
-                    }
-                }
-                if (optionsButton) break;
-            }
+        PauseLayer::customSetup();
+
+        auto rightMenu = this->getChildByID("right-button-menu");
+        if (!rightMenu) {
+            log::error("right-button-menu not found");
+            return;
         }
-        
-        if (optionsButton && parentMenu) {
-            // make btn
-            auto myButtonSprite = CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png");
-            auto myButton = CCMenuItemSpriteExtra::create(
-                myButtonSprite,
-                this,
-                menu_selector(MyPauseLayer::onMyButton)
-            );
-            
-            // put below options
-            auto optionsPos = optionsButton->getPosition();
-            myButton->setPosition(optionsPos.x, optionsPos.y - 100);
-            parentMenu->addChild(myButton);
-        } else {
-            log::error("Options button not found!");
-        }
+
+        auto myButtonSprite = CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png");
+        auto myButton = CCMenuItemSpriteExtra::create(
+            myButtonSprite,
+            this,
+            menu_selector(MyPauseLayer::onMyButton)
+        );
+
+        rightMenu->addChild(myButton);
+        static_cast<CCMenu*>(rightMenu)->updateLayout();
     }
     
     void onMyButton(CCObject*) {
