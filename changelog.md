@@ -1,4 +1,11 @@
 # ChatGD Changelog
+## v1.0.1
+- Removed debug logs
+- Fixed readme
+- added node ids as a dep
+- used layouts for the settings button
+- chat on ui layer 
+- text wrapping in chat
 ## v1.0.0
 - UPDATED TO GEODE v5 WOOOOO ITS OUT
 - Made no go and stuff like that more intense based on % (speed tweak needed)
