@@ -23,6 +23,8 @@ static std::vector<std::string> GD_PLAYERS = {
     "Axiom", "Human", "siniNight"
 };
 
+// static std::vector<bool> hasSpoken;
+
 static std::string randomPlayer() {
     return GD_PLAYERS[rand() % GD_PLAYERS.size()];
 }
@@ -204,6 +206,16 @@ public:
                 addChatMessage(messages[rand() % messages.size()]);
                 fields->m_randomChatTimer = 0;
                 fields->m_nextChatDelay = 0.1f + (rand() % 3) / 10.0f;
+            }
+        } else {
+            fields->m_randomChatTimer += dt;
+            if (fields->m_randomChatTimer >= fields->m_nextChatDelay) {
+                std::vector<std::string> messages = {
+                    chat("Hi")
+                };
+                addChatMessage(messages[rand() % messages.size()]);
+                fields->m_randomChatTimer = 0;
+                fields->m_nextChatDelay = 0.5f;
             }
         }
     }
@@ -453,6 +465,7 @@ class $modify(MenuLayer) {
             std::sort(GD_PLAYERS.begin(), GD_PLAYERS.end());
             GD_PLAYERS.erase(std::unique(GD_PLAYERS.begin(), GD_PLAYERS.end()), GD_PLAYERS.end());
         }).detach();
+        // hasSpoken.assign(GD_PLAYERS.size(), false);
         return true;
     }
 };
