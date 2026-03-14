@@ -14,7 +14,7 @@ static const std::vector<std::string> GD_PLAYERS = {
     "Cyclic", "Knobbelboy", "Sunix", "Technical49", "Dorami",
     "SpaceUK", "Diamond", "Trick", "Zoink", "Nswish",
     "Cursed", "BlassCFB", "MiKhaXx", "Mullsy", "Luqualizer",
-    "Npesta", "xanii", "BTD6", "GuitarHeroStyles", "Cataclysm",
+    "Npesta", "xanii", "BTD6", "Cataclysm",
     "Krazyman50", "Zobros", "Sea1997", "Pennutoh", "FunnyGame",
     "TrusTa", "RicoLP", "ViPriN", "ChaSe", "Lemons",
     "Vortrox",
