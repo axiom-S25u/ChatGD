@@ -3,11 +3,12 @@
 #include <Geode/modify/PauseLayer.hpp>
 #include <Geode/ui/Popup.hpp>
 #include <Geode/ui/TextInput.hpp>
+#include <Geode/modify/MenuLayer.hpp>
 
 
 using namespace geode::prelude;
 
-static const std::vector<std::string> GD_PLAYERS = {
+static std::vector<std::string> GD_PLAYERS = {
     // Streamers
     "Michigun", "Viprin", "Riot", "Juniper", "Wulzy",
     "EVW", "Doggie", "Nexus", "AeonAir", "Tride",
@@ -432,5 +433,26 @@ class $modify(MyPauseLayer, PauseLayer) {
     
     void onMyButton(CCObject*) {
         ChatConfigPopup::create()->show();
+    }
+};
+
+class $modify(MenuLayer) {
+    bool init() {
+        if (!MenuLayer::init()) return false;
+        std::thread([]() {
+            auto res = web::WebRequest().getSync("https://badges.hiimjasmine00.com/developer");
+            if (!res.ok()) {
+                log::error("Failed to fetch dev list: {}", res.code());
+                return;
+            }
+            auto arr = res.json().unwrapOr(matjson::Value{})
+                .asArray().unwrapOr(std::vector<matjson::Value>{});
+            for (auto& entry : arr) {
+                GD_PLAYERS.push_back(entry["name"].asString().unwrapOrDefault());
+            }
+            std::sort(GD_PLAYERS.begin(), GD_PLAYERS.end());
+            GD_PLAYERS.erase(std::unique(GD_PLAYERS.begin(), GD_PLAYERS.end()), GD_PLAYERS.end());
+        }).detach();
+        return true;
     }
 };
